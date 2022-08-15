@@ -1,6 +1,6 @@
 # Getting Started with Finder-App
 
-this porjext allows user to serach for spesific user in github. the point of this projedt is to demonstrate how to work with api's while using react.
+this porject allows user to serach for spesific user in github. the point of this projedt is to demonstrate how to work with api's while using react.
 
 ## Available Scripts
 
