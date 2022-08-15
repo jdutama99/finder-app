@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# Getting Started with Finder-App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+this porjext allows user to serach for spesific user in github. the point of this projedt is to demonstrate how to work with api's while using react.
 
 ## Available Scripts
 
