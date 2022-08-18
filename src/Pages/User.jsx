@@ -4,17 +4,22 @@ import { useParams, Link } from 'react-router-dom'
 import Spinner from '../components/layout/Spinner'
 import RepoList from '../components/repos/RepoList'
 import GithubContext from '../Context/github/GithubContext'
+import { getUserAndRepos } from '../Context/github/GithubActions'
 
 function User() {
-  const { getUser, user, loading, getUserRepos, repos } =
-    useContext(GithubContext)
+  const { user, loading, repos, dispatch } = useContext(GithubContext)
 
   const params = useParams()
 
   useEffect(() => {
-    getUser(params.login)
-    getUserRepos(params.login)
-  }, [])
+    dispatch({ type: 'SET_LOADING' })
+    const getUserData = async () => {
+      const userData = await getUserAndRepos(params.login)
+      dispatch({ type: 'GET_USER_AND_REPOS', payload: userData })
+    }
+
+    getUserData()
+  }, [dispatch, params.login])
 
   const {
     name,
@@ -36,14 +41,28 @@ function User() {
   if (loading) {
     return <Spinner />
   }
+
+  // NOTE: check for valid url to users website
+
+  const websiteUrl = blog?.startsWith('http') ? blog : 'https://' + blog
+
+  // NOTE: code here has been fixed so that stats no longer show scroll bar on
+  // mobile / small devices
+  // https://www.udemy.com/course/react-front-to-back-2022/learn/lecture/29768968#questions/16902278
+
+  // NOTE: if you are having problems with the name and login showing at the top
+  // of the image then you need the className='flex-grow-0' on the <p> tag
+  // default styling on <p> in daisyUI now has flex-grow-1
+
   return (
     <>
       <div className="w-full mx-auto lg:w-10/12">
         <div className="mb-4">
           <Link to="/" className="btn btn-ghost">
-            Back to Search
+            Back To Search
           </Link>
         </div>
+
         <div className="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-3 mb-8 md:gap-8">
           <div className="custom-card-image mb-6 md:mb-0">
             <div className="rounded-lg shadow-xl card image-full">
@@ -56,11 +75,12 @@ function User() {
               </div>
             </div>
           </div>
+
           <div className="col-span-2">
             <div className="mb-6">
               <h1 className="text-3xl card-title">
                 {name}
-                <div className="ml-2 mr-2 badge badge-success">{type}</div>
+                <div className="ml-2 mr-1 badge badge-success">{type}</div>
                 {hireable && (
                   <div className="mx-1 badge badge-info">Hireable</div>
                 )}
@@ -73,11 +93,11 @@ function User() {
                   rel="noreferrer"
                   className="btn btn-outline"
                 >
-                  Visit Github profile
+                  Visit Github Profile
                 </a>
               </div>
             </div>
-            {/* Location */}
+
             <div className="w-full rounded-lg shadow-md bg-base-100 stats">
               {location && (
                 <div className="stat">
@@ -89,12 +109,8 @@ function User() {
                 <div className="stat">
                   <div className="stat-title text-md">Website</div>
                   <div className="text-lg stat-value">
-                    <a
-                      href={`https://${blog}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {blog}
+                    <a href={websiteUrl} target="_blank" rel="noreferrer">
+                      {websiteUrl}
                     </a>
                   </div>
                 </div>
@@ -117,9 +133,8 @@ function User() {
           </div>
         </div>
 
-        {/* follower,following, repos, count */}
         <div className="w-full py-5 mb-6 rounded-lg shadow-md bg-base-100 stats">
-          <div className="grid grid-cols-1 md:grid-cols-4">
+          <div className="grid grid-cols-1 md:grid-cols-3">
             <div className="stat">
               <div className="stat-figure text-secondary">
                 <FaUsers className="text-3xl md:text-5xl" />
@@ -161,6 +176,7 @@ function User() {
             </div>
           </div>
         </div>
+
         <RepoList repos={repos} />
       </div>
     </>
